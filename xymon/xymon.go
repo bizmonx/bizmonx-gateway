@@ -3,7 +3,6 @@ package xymon
 import (
 	"fmt"
 	"net"
-	"os"
 )
 
 type StatusMessage struct {
@@ -65,7 +64,8 @@ func (x *StatusMessage) Send(h *XymonHost) error {
 	conn, err := net.Dial("tcp", "localhost:1984")
 	if err != nil {
 		fmt.Println("Error connecting:", err.Error())
-		os.Exit(1)
+		//os.Exit(1)
+		return err
 	}
 	// Close the connection when the function exits
 	defer conn.Close()

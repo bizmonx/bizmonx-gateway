@@ -45,12 +45,17 @@ func main() {
 	h = &x.XymonHost{Host: host, Port: p}
 
 	//http.HandleFunc("/", handler)
-	http.HandleFunc("/status", statusHandler)
-	http.HandleFunc("/data", dataHandler)
+	version := "/api/v1"
+	http.HandleFunc(version+"/status", statusHandler)
+	http.HandleFunc(version+"/data", dataHandler)
 
 	log.Println("Listening on :" + serverPort + "...")
 	server := &http.Server{Addr: ":" + serverPort, Handler: nil}
 
+	fmt.Printf("Server starting on port %s\n", serverPort)
+	if err := server.ListenAndServe(); err != http.ErrServerClosed {
+		log.Fatalf("HTTP server ListenAndServe: %v", err)
+	}
 	//log.Fatal(http.ListenAndServe(":1976", nil))
 
 	// Set up channel to receive OS signals
@@ -73,6 +78,7 @@ func main() {
 }
 
 func statusHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("xymon host: " + h.Host + " port: " + strconv.Itoa(h.Port))
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
 		return
@@ -92,7 +98,11 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error parsing request body", http.StatusInternalServerError)
 		return
 	}
-	msg.Send(h)
+	err = msg.Send(h)
+	if err != nil {
+		http.Error(w, "Error sending message: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	// Now forward this message to the Xymon server
 
@@ -118,7 +128,11 @@ func dataHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error parsing request body", http.StatusInternalServerError)
 		return
 	}
-	msg.Send(h)
+	err = msg.Send(h)
+	if err != nil {
+		http.Error(w, "Error sending message: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	// Now forward this message to the Xymon server
 
