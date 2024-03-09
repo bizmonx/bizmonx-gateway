@@ -28,13 +28,13 @@ type XymonHost struct {
 func (x *StatusMessage) Stringify() string {
 	lifetime := map[bool]string{true: "+" + x.Lifetime, false: ""}[x.Lifetime != ""]
 	m := fmt.Sprintf("status%s %s.%s %s %s ", lifetime, x.Host, x.Test, x.Color, x.Message)
-	fmt.Print(m)
+	fmt.Println(m)
 	return m
 }
 
 func (x *DataMessage) Stringify() string {
 	m := fmt.Sprintf("data %s.%s\n%s ", x.Host, x.DataName, x.Message)
-	fmt.Print(m)
+	fmt.Println(m)
 	return m
 }
 
